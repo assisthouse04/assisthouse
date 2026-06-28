@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          String    @default("TECNICO") // ADMIN | TECNICO
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  ordens        OrdemServico[]
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Cliente {
+  id          String   @id @default(cuid())
+  nome        String
+  cpf         String   @unique
+  telefone    String
+  email       String?
+  endereco    String?
+  bairro      String?
+  cidade      String?
+  uf          String?
+  cep         String?
+  observacoes String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ordens      OrdemServico[]
+}
+
+model Equipamento {
+  id              String   @id @default(cuid())
+  tipo            String   // notebook, computador, impressora, celular, outros
+  marca           String
+  modelo          String
+  numeroSerie     String?
+  estadoFisico    String?
+  senha           String?  // campo protegido
+  acessorios      String?  // JSON string com lista de acessórios
+  observacoes     String?
+  fotos           String?  // JSON string com array de caminhos das fotos
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  ordens          OrdemServico[]
+}
+
+model OrdemServico {
+  id                  String    @id @default(cuid())
+  numero              String    @unique
+  status              String    @default("RECEBIDO")
+  // RECEBIDO | EM_ANALISE | ORCAMENTO | ORCAMENTO_APROVADO |
+  // AGUARDANDO_PECAS | EM_MANUTENCAO | PRONTO | FINALIZADO | ENTREGUE | CANCELADO
+
+  clienteId           String
+  cliente             Cliente   @relation(fields: [clienteId], references: [id])
+
+  equipamentoId       String
+  equipamento         Equipamento @relation(fields: [equipamentoId], references: [id])
+
+  tecnicoId           String?
+  tecnico             User?     @relation(fields: [tecnicoId], references: [id])
+
+  defeito             String    // defeito informado pelo cliente
+  diagnostico         String?   // diagnóstico técnico
+  servicoExecutado    String?
+  pecasUtilizadas     String?
+  valor               Float     @default(0)
+  formaPagamento      String?   // dinheiro, pix, cartao_debito, cartao_credito
+  garantia            String?   // descrição da garantia
+  observacoes         String?
+
+  // Financeiro
+  pago                Boolean   @default(false)
+  dataPagamento       DateTime?
+
+  // Confirmação do cliente
+  confirmacaoWhatsapp String?   // caminho do arquivo/print
+  confirmacaoEmail    String?
+
+  dataEntrada         DateTime  @default(now())
+  dataConclusao       DateTime?
+  dataEntrega         DateTime?
+  updatedAt           DateTime  @updatedAt
+
+  lancamentos         LancamentoFinanceiro[]
+}
+
+model LancamentoFinanceiro {
+  id            String       @id @default(cuid())
+  tipo          String       // RECEITA | DESPESA
+  descricao     String
+  valor         Float
+  formaPagamento String?
+  pago          Boolean      @default(false)
+  dataVencimento DateTime?
+  dataPagamento DateTime?
+  ordemId       String?
+  ordem         OrdemServico? @relation(fields: [ordemId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Configuracao {
+  id        String   @id @default(cuid())
+  chave     String   @unique
+  valor     String
+  updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,94 @@
+================================================================
+  ASSISTHOUSE INFORMÁTICA — Sistema de Gestão
+  Guia de Instalação e Primeiro Acesso
+================================================================
+
+PRÉ-REQUISITOS
+--------------
+- Node.js 18 ou superior (já instalado na sua máquina)
+- Terminal (Prompt de Comando, PowerShell ou Git Bash)
+
+PASSO A PASSO
+-------------
+
+1. Abra o terminal e navegue até a pasta do projeto:
+   cd assisthouse
+
+2. Instale as dependências:
+   npm install
+
+3. Configure o banco de dados (cria o arquivo dev.db automaticamente):
+   npx prisma db push
+
+4. Popule o banco com o usuário administrador:
+   npm run db:seed
+
+5. Inicie o servidor de desenvolvimento:
+   npm run dev
+
+6. Acesse no navegador:
+   http://localhost:3000
+
+CREDENCIAIS INICIAIS
+--------------------
+   E-mail:  admin@assisthouse.com
+   Senha:   admin123
+
+   ⚠️  IMPORTANTE: Altere a senha após o primeiro acesso!
+       Vá em Usuários > selecione o admin > Editar
+
+ESTRUTURA DO PROJETO
+--------------------
+assisthouse/
+├── app/
+│   ├── (auth)/login/         → Tela de login
+│   ├── (dashboard)/
+│   │   ├── dashboard/        → Painel principal
+│   │   ├── clientes/         → Gestão de clientes
+│   │   ├── equipamentos/     → Cadastro de equipamentos
+│   │   ├── ordens/           → Ordens de Serviço (CRUD + PDF)
+│   │   ├── financeiro/       → Controle financeiro
+│   │   ├── relatorios/       → Relatórios e estatísticas
+│   │   ├── usuarios/         → Gestão de usuários
+│   │   └── configuracoes/    → Dados da empresa
+│   └── api/                  → Rotas da API REST
+├── prisma/
+│   ├── schema.prisma         → Estrutura do banco de dados
+│   └── dev.db                → Banco SQLite (criado após db push)
+├── lib/
+│   ├── auth.ts               → Configuração de autenticação
+│   ├── prisma.ts             → Cliente do banco de dados
+│   └── utils.ts              → Funções auxiliares
+└── .env                      → Configurações do ambiente
+
+FUNCIONALIDADES INCLUÍDAS
+--------------------------
+✅ Login com perfis Admin e Técnico
+✅ Dashboard com KPIs em tempo real
+✅ Cadastro de clientes com pesquisa por nome/CPF/telefone
+✅ Cadastro de equipamentos com acessórios e senha protegida
+✅ Ordens de Serviço com fluxo completo de status
+✅ Nova OS em 3 passos (cliente → equipamento → dados)
+✅ Geração de PDF da OS com layout profissional
+✅ Compartilhamento via WhatsApp com link direto
+✅ Controle financeiro com filtros por período e status
+✅ Relatórios com gráficos de barras por status e mês
+✅ Gestão de usuários com ativação/desativação
+✅ Configurações dos dados da empresa
+
+BANCO DE DADOS
+--------------
+Arquivo: prisma/dev.db (SQLite — não precisa instalar nada)
+Backup manual: copie o arquivo dev.db periodicamente
+
+PARA COLOCAR EM PRODUÇÃO
+-------------------------
+1. Use https://vercel.com (gratuito para projetos pessoais)
+   npm run build  →  vercel deploy
+
+2. Ou hospede em qualquer VPS com Node.js:
+   npm run build && npm start
+
+================================================================
+  Dúvidas? josinaldoms04@gmail.com | (83) 98821-4778
+================================================================
